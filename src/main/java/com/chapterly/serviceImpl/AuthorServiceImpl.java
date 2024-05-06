@@ -84,7 +84,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    @CachePut(cacheNames = "author", key = "#p0")
+//    @CachePut(cacheNames = "author", key = "#p0")
     public AuthorDto updateAuthorDetailsById(Long authorId, AuthorDto authorDto) {
         AuthorDto author = null;
         if (authorDto != null) {
@@ -106,7 +106,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "author", key = "#p0")
+//    @CacheEvict(cacheNames = "author", key = "#p0")
     public boolean deleteAuthorDetailsById(Long authorId) {
         if (authorId != null) {
             Author author = authorRepo.findById(authorId).get();

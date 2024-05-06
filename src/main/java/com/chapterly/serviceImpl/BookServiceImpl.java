@@ -147,7 +147,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @CachePut(cacheNames = "updatedBook", key = "#p0")
+//    @CachePut(cacheNames = "updatedBook", key = "#p0")
     public BookDto updateBookDetails(Long bookId, BookDto bookDto) {
         BookDto bookResponse = null;
         if (bookId != null && bookDto != null) {
@@ -165,7 +165,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "book", key = "#p0")
+//    @CacheEvict(cacheNames = "book", key = "#p0")
     public boolean deleteBookById(Long bookId) {
         if(bookId != null){
             Book book = bookRepo.findById(bookId).get();
@@ -179,7 +179,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Cacheable(value = "books", key = "'cache_'+#root.methodName")
+//    @Cacheable(value = "books", key = "'cache_'+#root.methodName")
     public List<BookDto> getAllBooks() {
         List<Book> allBooks = bookRepo.findAll();
         List<BookDto> books = allBooks.stream().map(book -> {
@@ -297,7 +297,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Cacheable(value = "booksSortedByTitle", key = "'cache_'+#root.methodName")
+//    @Cacheable(value = "booksSortedByTitle", key = "'cache_'+#root.methodName")
     public List<BookDto> getAllBooksSortedByTitle() {
         List<Book> allBooks = bookRepo.findAllBooksSortedByTitle();
         List<BookDto> books = allBooks.stream().map(book -> {
@@ -312,7 +312,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Cacheable(value = "booksSortedByAuthor",key = "'cache_'+#root.methodName")
+//    @Cacheable(value = "booksSortedByAuthor",key = "'cache_'+#root.methodName")
     public List<BookDto> getAllBooksSortedByAuthor() {
         List<Book> allBooks = bookRepo.findAllBooksSortedByAuthorName();
         List<BookDto> books = allBooks.stream().map(book -> {
@@ -327,7 +327,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Cacheable(value = "totalBooks", key = "'cache_'+#root.methodName")
+//    @Cacheable(value = "totalBooks", key = "'cache_'+#root.methodName")
     public int getNumberOfBooks() {
         int count = 0;
         try {

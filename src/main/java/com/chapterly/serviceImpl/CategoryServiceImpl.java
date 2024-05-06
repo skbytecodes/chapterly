@@ -102,7 +102,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Cacheable(value = "categories", key = "'cache_'+#root.methodName")
+//    @Cacheable(value = "categories", key = "'cache_'+#root.methodName")
     public List<CategoryDto> getAllCategories() {
         List<Category> allCategories = categoryRepo.findAll();
         List<CategoryDto> categories = allCategories.stream().map(cat -> {
