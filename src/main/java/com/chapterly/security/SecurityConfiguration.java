@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .csrf((csrf) -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/register", "/api/v1/authenticate", "/api/v1/open")
+                .requestMatchers("/", "/api/v1/register", "/api/v1/authenticate", "/api/v1/open")
                 .permitAll()
                 .requestMatchers("/api/v1/categories", "/api/v1/search/{key}", "/api/v1/banners"
                         , "/api/v1/featuredAuthors/{count}", "/api/v1/books/category/{categoryName}"
