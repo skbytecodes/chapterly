@@ -6,6 +6,7 @@ import com.chapterly.entity.Category;
 import com.chapterly.mapper.CategoryMapper;
 import com.chapterly.repository.CategoryRepo;
 import com.chapterly.service.CategoryService;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryMapper categoryMapper;
     Logger logger = LoggerFactory.getLogger("CategoryServiceImpl");
     @Override
-    public CategoryDto addCategory(MultipartFile file, String data) {
+    public CategoryDto addCategory(MultipartFile file, String data) throws JsonMappingException, JsonParseException {
         CategoryDto response = null;
         if (data != null && file != null) {
             Category category = null;
@@ -46,17 +47,21 @@ public class CategoryServiceImpl implements CategoryService {
                 category = mapper.readValue(data, Category.class);
             } catch (JsonMappingException e) {
                 logger.error("ERROR ", e);
+                throw new JsonMappingException("ERROR");
             } catch (JsonProcessingException e) {
                 logger.error("ERROR ", e);
+                throw new JsonParseException("BAD REQUEST");
             }
 
             try {
                 String fileDownloadUri = amazonClient.uploadFile(file);
+                assert category != null;
                 category.setImageUrl(fileDownloadUri);
                 category.setImageName(file.getOriginalFilename());
             } catch (Exception e) {
                 logger.error("ERROR", e);
             }
+            assert category != null;
             category.setBooksCount(0);
             categoryRepo.save(category);
 

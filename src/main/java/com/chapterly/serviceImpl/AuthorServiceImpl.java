@@ -3,12 +3,15 @@ package com.chapterly.serviceImpl;
 import com.chapterly.aws.AmazonClient;
 import com.chapterly.dto.AuthorDto;
 import com.chapterly.entity.Author;
+import com.chapterly.entity.Genre;
 import com.chapterly.mapper.AuthorMapper;
 import com.chapterly.repository.AuthorRepo;
 import com.chapterly.service.AuthorService;
+import com.chapterly.service.GenreService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +39,17 @@ public class AuthorServiceImpl implements AuthorService {
     @Autowired
     private AuthorMapper authorMapper;
 
+
+    @Autowired
+    private GenreService genreService;
+
     @Value("${s3.endpointUrl}")
     private String parentUrl;
 
     Logger logger = LoggerFactory.getLogger("AuthorServiceImpl");
 
     @Override
-    public AuthorDto saveAuthorDetails(MultipartFile file, String data) {
+    public AuthorDto saveAuthorDetails(MultipartFile file, String data) throws JsonMappingException {
         Author author = null;
         if (data != null) {
             try {
@@ -50,24 +57,34 @@ public class AuthorServiceImpl implements AuthorService {
                 author = objectMapper.readValue(data, Author.class);
             } catch (JsonProcessingException e) {
                 logger.error("ERROR ", e);
-                return null;
+                throw new JsonMappingException("ERROR ", e);
             }
         }
 
         if (file != null) {
             try {
                 String fileDownloadUri = amazonClient.uploadFile(file);
+                assert author != null;
                 author.setImageUrl(fileDownloadUri);
                 author.setImageName(file.getOriginalFilename());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+        assert author != null;
+        List<Genre> categorySpecializations = new ArrayList<>();
+        List<Genre> genres = author.getCategorySpecialization();
+        genres.forEach(genre -> {
+            Genre genreByName = genreService.getGenreByName(genre.getName());
+            if (genreByName == null)
+                throw new RuntimeJsonMappingException("GENRE NOT FOUND");
+            categorySpecializations.add(genreByName);
+        });
+
+        author.setCategorySpecialization(categorySpecializations);
         Author savedAuthor = authorRepo.save(author);
         AuthorDto authorResponse = authorMapper.toDto(savedAuthor);
-        if (savedAuthor != null) {
-            authorResponse.setImageUrl(parentUrl + "/" + author.getImageUrl());
-        }
+        authorResponse.setImageUrl(parentUrl + "/" + author.getImageUrl());
         return authorResponse;
     }
 

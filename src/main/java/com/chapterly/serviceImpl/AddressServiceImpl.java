@@ -1,7 +1,6 @@
 package com.chapterly.serviceImpl;
 
 import com.chapterly.dto.AddressDto;
-import com.chapterly.dto.UserDto;
 import com.chapterly.entity.Address;
 import com.chapterly.entity.User;
 import com.chapterly.mapper.AddressMapper;
@@ -37,7 +36,6 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressDto savePermanentAddressOfUser(AddressDto addressRequest) {
-        // I cannot declare it as a bean because i want this to be created everytime
         Address address = new Address();
         if (addressRequest != null) {
             address.setHouseNo(addressRequest.getHouseNo());
@@ -50,6 +48,16 @@ public class AddressServiceImpl implements AddressService {
             addressRepo.save(address);
         }
         return addressRequest;
+    }
+
+    @Override
+    public Address saveAddress(Address address) {
+        try {
+            return addressRepo.save(address);
+        }catch (Exception e) {
+            logger.error("Error saving address"+e.getMessage());
+            throw new RuntimeException("SOMETHING WENT WRONG");
+        }
     }
 
     @Override

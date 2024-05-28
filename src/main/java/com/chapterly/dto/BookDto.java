@@ -20,6 +20,7 @@ public class BookDto implements Serializable {
     private String edition;
     private int pages;
     private String description;
+    private String bookIntro;
     private Double price;
     private String image_url;
     private String imageName;
@@ -154,5 +155,13 @@ public class BookDto implements Serializable {
 
     public void setRating(RatingResponse rating) {
         this.rating = rating;
+    }
+
+    public String getBookIntro() {
+        return bookIntro;
+    }
+
+    public void setBookIntro(String bookIntro) {
+        this.bookIntro = bookIntro;
     }
 }

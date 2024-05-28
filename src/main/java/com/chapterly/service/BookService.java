@@ -4,12 +4,14 @@ import com.chapterly.dto.BannerDto;
 import com.chapterly.dto.BookDto;
 import com.chapterly.entity.Book;
 import com.chapterly.records.SearchRecord;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface BookService {
-    BookDto addBook(MultipartFile file, String data, MultipartFile authorImage);
+    BookDto addBook(MultipartFile file, String data, MultipartFile authorImage) throws JsonMappingException, FileUploadException;
     BookDto getBookById(Long bookId);
     BookDto updateBookDetails(Long bookId, BookDto book);
      boolean deleteBookById(Long bookId);

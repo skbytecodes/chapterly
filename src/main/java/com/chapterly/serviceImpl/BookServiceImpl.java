@@ -65,7 +65,7 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public BookDto addBook(MultipartFile file, String data, MultipartFile authorImage) {
+    public BookDto addBook(MultipartFile file, String data, MultipartFile authorImage) throws JsonMappingException, FileUploadException {
         BookDto response = null;
         if (data != null && file != null) {
             Book book = null;
@@ -74,29 +74,17 @@ public class BookServiceImpl implements BookService {
                 book = mapper.readValue(data, Book.class);
             } catch (JsonProcessingException e) {
                 logger.error("ERROR ", e);
-                return null;
+                throw new JsonMappingException("JSONMAPPING ERROR");
             }
 
             String fileDownloadUri = "";
-            String authorImageUri = "";
             try {
                 fileDownloadUri = amazonClient.uploadFile(file);
                 book.setImage_url(fileDownloadUri);
                 book.setImageName(file.getOriginalFilename());
-                if(authorImage != null){
-                    Author author = authorService.getAuthorByName(book.getAuthor().getName());
-                    if(author == null){
-                        authorImageUri = amazonClient.uploadFile(authorImage);
-                        book.getAuthor().setImageUrl(authorImageUri);
-                        book.getAuthor().setImageName(authorImage.getOriginalFilename());
-                    }
-                }
-            } catch (FileUploadException e) {
+            } catch (Exception e) {
                 logger.error("ERROR", e);
-                return null;
-            }catch (Exception e){
-                logger.error("ERROR", e);
-                return null;
+                throw new FileUploadException("ERROR", e);
             }
             if(book.getCategories() != null && book.getCategories().size() > 0) {
                 List<Category> categories = book.getCategories().stream().map(cat -> {
@@ -109,22 +97,7 @@ public class BookServiceImpl implements BookService {
                 book.setCategories(categories);
             }
 
-            List<Genre> genres = null;
-            if(book.getAuthor() != null) {
-                genres = book.getAuthor().getCategorySpecialization().stream().map(genre -> {
-                    Genre genreByName = genreService.getGenreByName(genre.getName());
-                    if (genreByName == null)
-                        throw new RuntimeJsonMappingException("GENRE NOT FOUND");
-                    return genreByName;
-                }).collect(Collectors.toList());
-
-                if (book.getAuthor().getName() != null) {
-                    Author authorByName = authorService.getAuthorByName(book.getAuthor().getName());
-                    if (authorByName != null)
-                        book.setAuthor(authorByName);
-                }
-            }
-            book.getAuthor().setCategorySpecialization(genres);
+            book.setAuthor(authorService.getAuthorByName(book.getAuthor().getName()));
             Book saveBook = bookRepo.save(book);
             response = bookMapper.toDto(saveBook);
         }
@@ -154,7 +127,7 @@ public class BookServiceImpl implements BookService {
             Book book = bookRepo.findById(bookId).get();
             book.setEdition(bookDto.getEdition());
             book.setDescription(bookDto.getDescription());
-            book.setISBN(bookDto.getISBN());
+            book.setIsbnNo(bookDto.getISBN());
             book.setFormat(bookDto.getFormat());
             book.setPages(bookDto.getPages());
             book.setPrice(bookDto.getPrice());

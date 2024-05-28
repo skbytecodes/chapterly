@@ -1,14 +1,14 @@
 package com.chapterly.service;
 
 import com.chapterly.dto.AddressDto;
-import com.chapterly.dto.UserDto;
 import com.chapterly.entity.Address;
-import com.chapterly.entity.User;
 
 import java.util.List;
 
 public interface AddressService {
     public AddressDto savePermanentAddressOfUser(AddressDto address);
+
+    public Address saveAddress(Address address);
 
     public AddressDto getUserPermanentAddressById(Long addressId);
 

@@ -3,13 +3,10 @@ package com.chapterly.dto;
 import com.chapterly.security.Role;
 
 public class RegisterRequest {
-
     private String firstname;
     private String lastname;
     private String email;
     private String password;
-//    private Role role;
-
 
     public String getFirstname() {
         return firstname;

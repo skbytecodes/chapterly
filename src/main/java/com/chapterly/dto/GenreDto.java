@@ -6,7 +6,6 @@ import java.io.Serial;
 import java.io.Serializable;
 
 public class GenreDto implements Serializable {
-
     @NotEmpty(message = "Genre name must not be empty")
     private String name;
     @NotEmpty(message = "Genre description must not be empty")

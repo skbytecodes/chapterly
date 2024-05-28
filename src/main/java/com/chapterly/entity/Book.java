@@ -23,13 +23,12 @@ public class Book implements Serializable {
     @JoinColumn(
             name = "author_id", referencedColumnName = "authorId")
     private Author author;
-    @JsonIgnore
-    private String ISBN;
+    private String isbnNo;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "book_categories_map", joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "bookId"), inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "categoryId"))
 //    @JsonBackReference
-    @JsonIgnore
+//    @JsonIgnore
     private List<Category> categories;
     private String publisher;
     private LocalDate publicationDate;
@@ -45,6 +44,8 @@ public class Book implements Serializable {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "book")
     private List<Review> reviews;
+
+    private String bookIntro;
 
     private int discount;
 
@@ -72,13 +73,6 @@ public class Book implements Serializable {
         this.author = author;
     }
 
-    public String getISBN() {
-        return ISBN;
-    }
-
-    public void setISBN(String ISBN) {
-        this.ISBN = ISBN;
-    }
 
     public List<Category> getCategories() {
         return categories;
@@ -184,13 +178,30 @@ public class Book implements Serializable {
         this.discount = discount;
     }
 
+    public String getBookIntro() {
+        return bookIntro;
+    }
+
+    public void setBookIntro(String bookIntro) {
+        this.bookIntro = bookIntro;
+    }
+
+    public String getIsbnNo() {
+        return isbnNo;
+    }
+
+    public void setIsbnNo(String isbnNo) {
+        this.isbnNo = isbnNo;
+    }
+
+
     @Override
     public String toString() {
         return "Book{" +
                 "bookId=" + bookId +
                 ", title='" + title + '\'' +
                 ", author=" + author +
-                ", ISBN='" + ISBN + '\'' +
+                ", isbnNo='" + isbnNo + '\'' +
                 ", categories=" + categories +
                 ", publisher='" + publisher + '\'' +
                 ", publicationDate=" + publicationDate +
@@ -203,6 +214,7 @@ public class Book implements Serializable {
                 ", imageName='" + imageName + '\'' +
                 ", format='" + format + '\'' +
                 ", reviews=" + reviews +
+                ", bookIntro='" + bookIntro + '\'' +
                 ", discount=" + discount +
                 '}';
     }

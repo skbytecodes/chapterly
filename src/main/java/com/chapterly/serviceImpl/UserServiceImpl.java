@@ -1,31 +1,43 @@
 package com.chapterly.serviceImpl;
 
 import com.chapterly.aws.AmazonClient;
+import com.chapterly.dto.AuthenticationResponse;
 import com.chapterly.dto.UserDto;
+import com.chapterly.entity.Address;
 import com.chapterly.entity.User;
 import com.chapterly.mapper.UserMapper;
 import com.chapterly.repository.UserRepo;
+import com.chapterly.security.JwtService;
+import com.chapterly.security.Role;
+import com.chapterly.service.AddressService;
 import com.chapterly.service.UserService;
+import com.chapterly.util.UniqueUsernameGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,7 +45,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AmazonClient amazonClient;
     @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AddressService addressService;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Value("${s3.endpointUrl}")
     private String parentUrl;
@@ -44,40 +64,59 @@ public class UserServiceImpl implements UserService {
     Logger logger = LoggerFactory.getLogger("UserServiceImpl");
 
 
+    @Transactional
     @Override
-    public UserDto createUser(MultipartFile file, String data) {
-        UserDto response = null;
-        if (data != null && file != null) {
+    public AuthenticationResponse createUser(MultipartFile file, String data) throws JsonMappingException, JsonParseException, FileUploadException {
+        if (data != null) {
             User user = null;
             try {
                 ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
                 user = mapper.readValue(data, User.class);
             } catch (JsonMappingException e) {
                 logger.error("ERROR ", e);
+                throw new JsonMappingException("INVALID JSON");
             } catch (JsonProcessingException e) {
                 logger.error("ERROR ", e);
+                throw new JsonParseException("BAD REQUEST");
+            }
+            if(file != null){
+                try {
+                    String fileDownloadUri = amazonClient.uploadFile(file);
+                    user.setImageUrl(fileDownloadUri);
+                    user.setImageName(file.getOriginalFilename());
+                } catch (FileUploadException e) {
+                    logger.error("ERROR", e);
+                    throw new FileUploadException("INTERNAL SERVER ERROR");
+                }catch (Exception e){
+                    logger.error("ERROR", e);
+                    throw new RuntimeException("INTERNAL SERVER ERROR");
+                }
             }
 
-            try {
-                String fileDownloadUri = amazonClient.uploadFile(file);
-                user.setImageUrl(fileDownloadUri);
-                user.setImageName(file.getOriginalFilename());
-            } catch (FileUploadException e) {
-                logger.error("ERROR", e);
-            }catch (Exception e){
-                logger.error("ERROR", e);
+            Address address = null;
+            if(user.getAddress() != null){
+                address = addressService.saveAddress(user.getAddress());
+                if(address != null)
+                    user.setAddress(address);
+                else
+                    throw new JsonMappingException("UNPROCESSABLE MAPPING");
             }
-            if(user.getAddress() == null)
-                return null;
-            if(user.getShippingAddress() != null)
-                user.getShippingAddress().setUser(user);
-
-            user.getAddress().setUser(user);
             user.setAccountActive(true);
-            userRepo.save(user);
-            response = userMapper.toDto(user);
+            user.setAccount_creation_date(LocalDateTime.now());
+            user.setPwd(passwordEncoder.encode(user.getPwd()));
+            user.setRole(Role.USER);
+            UniqueUsernameGenerator usernameGenerator = new UniqueUsernameGenerator();
+            user.setUserName(usernameGenerator.generateUniqueUsername(user.getFirstName(), user.getLastName()));
+            User savedUser = userRepo.save(user);
+            assert address != null;
+            address.setUser(savedUser);
+            addressService.saveAddress(address);
+            var jwtToken = jwtService.generateToken(user);
+            var AuthenticationResponse = new AuthenticationResponse();
+            AuthenticationResponse.setAccessToken(jwtToken);
+            return AuthenticationResponse;
         }
-        return response;
+        return null;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class Address {
     @NotEmpty(message = "street can not be empty")
     private String street;
 
-    @NotEmpty(message = "street can not be empty")
+    @NotEmpty(message = "city can not be empty")
     private String city;
 
     @NotEmpty(message = "state can not be empty")

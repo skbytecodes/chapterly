@@ -36,7 +36,7 @@ public class Author implements Serializable {
 
 
 //    @JsonBackReference
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
            name = "author_genres",

@@ -1,8 +1,12 @@
 package com.chapterly.controller;
 
+import com.chapterly.dto.AuthenticationResponse;
 import com.chapterly.dto.UserDto;
 import com.chapterly.mapper.UserMapper;
 import com.chapterly.service.UserService;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +26,17 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
-    @PostMapping("/saveUser")
-    public ResponseEntity<?> saveUser(@RequestParam(value = "file",required = false)MultipartFile file, String data){
+    @PostMapping("/register")
+    public ResponseEntity<?> saveUser(@RequestParam(value = "file",required = false)MultipartFile file, @RequestParam("data") @Valid String data){
         try {
-            UserDto user = userService.createUser(file, data);
-            if(user == null)
+            AuthenticationResponse response = userService.createUser(file, data);
+            if(response == null)
                 return new ResponseEntity<>("NOT FOUND", HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>("SUCCESSFUL", HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (JsonMappingException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }catch (JsonParseException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>("SOMETHING WENT WRONG", HttpStatus.INTERNAL_SERVER_ERROR);

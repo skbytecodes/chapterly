@@ -1,13 +1,17 @@
 package com.chapterly.service;
 
+import com.chapterly.dto.AuthenticationResponse;
 import com.chapterly.dto.UserDto;
 import com.chapterly.entity.User;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface UserService {
-    public UserDto createUser(MultipartFile file, String data);
+    public AuthenticationResponse createUser(MultipartFile file, String data) throws JsonMappingException, JsonParseException, FileUploadException;
     public UserDto getUserById(Long userId);
     public UserDto updateProfileById(String userId, UserDto userDto);
     public boolean deleteUserById(Long userId);

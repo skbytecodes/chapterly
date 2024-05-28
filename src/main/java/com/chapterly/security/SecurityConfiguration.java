@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .csrf((csrf) -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/api/v1/register", "/api/v1/authenticate", "/api/v1/open")
+                .requestMatchers("/", "/api/v1/BookDto", "/api/v1/auth/authenticate", "/api/v1/open", "/api/v1/register", "/api/v1/addNewCategory")
                 .permitAll()
                 .requestMatchers("/api/v1/categories", "/api/v1/search/{key}", "/api/v1/banners"
                         , "/api/v1/featuredAuthors/{count}", "/api/v1/books/category/{categoryName}"
@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/v1/order/createOrder", "/api/v1/payment/success").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                 .anyRequest()
                 .authenticated()
+//                .permitAll()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -64,7 +65,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000/"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000/", "http://localhost:3001/"));
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);

@@ -4,6 +4,7 @@ import com.chapterly.security.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,13 +20,23 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     private String userName;
+
+    @NotEmpty(message = "FirstName cannot be empty")
     private String firstName;
+
+    @NotEmpty(message = "LastName cannot be empty")
     private String lastName;
+
+    @NotEmpty(message = "Email cannot be empty")
     private String email;
+
+    @NotEmpty(message = "Password cannot be empty")
     private String pwd;
+
+    @NotEmpty(message = "Phone cannot be empty")
     private String phone;
 
-    @JsonIgnore
+//    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(
             name = "address_id",
