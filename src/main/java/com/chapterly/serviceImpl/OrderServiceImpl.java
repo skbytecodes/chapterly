@@ -90,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
                 com.chapterly.entity.Order userOrder = new com.chapterly.entity.Order();
                 userOrder.setStatus("Ordered");
                 userOrder.setOrderDate(LocalDateTime.now());
-                userOrder.setTotalAmount(amount * 100);
+                userOrder.setTotalAmount(amount);
                 userOrder.setPaymentMethod("NO PAYMENT YET");
                 userOrder.setRazorpayOrderId(order.get("id"));
                 user.setShippingAddress(product.getShippingAddress());

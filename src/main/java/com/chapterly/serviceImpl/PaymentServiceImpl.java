@@ -173,8 +173,7 @@ public class PaymentServiceImpl implements PaymentService {
         orderByRazorPayOrderId.setPaymentMethod(payment.get("method"));
         orderRepo.save(orderByRazorPayOrderId);
         userPayment.setOrder(orderByRazorPayOrderId);
-        userPayment.setAmount(Double.parseDouble(payment.get("amount").toString()));
-
+        userPayment.setAmount((Double.parseDouble(payment.get("amount").toString()))/100);
         String jsonCard = payment.get("card").toString();
         ObjectMapper objectMapper = new ObjectMapper();
         HashMap<String, Object> card = null;
