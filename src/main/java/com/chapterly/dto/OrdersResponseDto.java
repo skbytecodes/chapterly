@@ -12,6 +12,10 @@ public class OrdersResponseDto implements Serializable {
     private List<OrderResponse> orderedItems;
     private String totalOrderAmount;
 
+    private String deliveryTimeStamp;
+
+    private String cardLastDigits;
+
     public String getOrderId() {
         return orderId;
     }
@@ -42,5 +46,21 @@ public class OrdersResponseDto implements Serializable {
 
     public void setTotalOrderAmount(String totalOrderAmount) {
         this.totalOrderAmount = totalOrderAmount;
+    }
+
+    public String getDeliveryTimeStamp() {
+        return deliveryTimeStamp;
+    }
+
+    public void setDeliveryTimeStamp(String deliveryTimeStamp) {
+        this.deliveryTimeStamp = deliveryTimeStamp;
+    }
+
+    public String getCardLastDigits() {
+        return cardLastDigits;
+    }
+
+    public void setCardLastDigits(String cardLastDigits) {
+        this.cardLastDigits = cardLastDigits;
     }
 }

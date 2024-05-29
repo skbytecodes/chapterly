@@ -175,6 +175,8 @@ public class OrderServiceImpl implements OrderService {
                 order.setPayment_status(item.getPayment_status());
                 order.setBook_image(parentUrl+"/"+item.getBook_image());
                 order.setFormat(item.getFormat());
+                order.setCardLastFourDigits(item.getCardLastFourDigits());
+                order.setDeliveryDate(item.getDelivery_date());
                 return order;
             }).sorted(Comparator.comparing(OrderResponse :: getOrder_id)).collect(Collectors.toList());
 
@@ -192,6 +194,8 @@ public class OrderServiceImpl implements OrderService {
                 allOrders.setOrderPaymentTimeStamp(order.getPayment_date());
                 allOrders.setTotalOrderAmount(order.getTotal_amount());
                 allOrders.setOrderedItems(orderResponses);
+                allOrders.setDeliveryTimeStamp(order.getDeliveryDate());
+                allOrders.setCardLastDigits(order.getCardLastFourDigits());
                 userOrders.add(allOrders);
             }
             return userOrders;

@@ -28,4 +28,7 @@ public interface OrderDtoInterf {
     String getPayment_status();
 
     String getFormat();
+
+    String getCardLastFourDigits();
+    String getDelivery_date();
 }

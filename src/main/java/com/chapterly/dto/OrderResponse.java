@@ -19,7 +19,11 @@ public class OrderResponse implements Serializable {
     private String payment_date;
     private String payment_status;
 
+    private String cardLastFourDigits;
+
     private String format;
+
+    private String deliveryDate;
 
 
     public String getOrder_id() {
@@ -134,8 +138,21 @@ public class OrderResponse implements Serializable {
         this.format = format;
     }
 
+    public String getCardLastFourDigits() {
+        return cardLastFourDigits;
+    }
 
+    public String getDeliveryDate() {
+        return deliveryDate;
+    }
 
+    public void setDeliveryDate(String deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
+    public void setCardLastFourDigits(String cardLastFourDigits) {
+        this.cardLastFourDigits = cardLastFourDigits;
+    }
 
     @Override
     public boolean equals(Object obj) {
